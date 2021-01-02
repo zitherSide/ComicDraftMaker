@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <v-row v-for="(row, rowId) in cards" :key="rowId" align="center" justify="center">
+    <v-row v-for="(row, rowId) in cards" :key="rowId" align="center" justify="">
       <v-col v-for="(card, colId) in row" :key="colId" :cols="Math.max(1, card.cols)">
         <v-card >
           <v-card-actions class='justify-space-between'>
