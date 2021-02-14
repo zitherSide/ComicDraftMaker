@@ -10,18 +10,12 @@
     <v-row>
         <v-col cols="1" align="center" align-self="center">
             <v-row class="ma-5">
-                <v-btn icon v-if="hasPage($route.params.page + 1)" @click="$router.push(`${$route.params.page + 1}`)">
+                <v-btn icon v-if="hasPage($route.params.page + 1)" @click="movePage(`${$route.params.page + 1}`)">
                     <v-icon>mdi-arrow-left</v-icon>
                 </v-btn>
             </v-row>
             <v-row class="mt-5 ml-5">
-                <v-btn color="primary" @click="addNewPage"><v-icon>mdi-plus</v-icon></v-btn>
-            </v-row>
-            <v-row class="mt-5 ml-5">
-                <v-btn outlined @click="cards.forEach(elem => elem.unshift(Object.create(emptyCell)))"><v-icon>mdi-plus</v-icon></v-btn>
-            </v-row>
-            <v-row class="ma-5">
-                <v-btn outlined @click="cards.forEach(elem => elem.pop())"><v-icon>mdi-minus</v-icon></v-btn>
+                <v-btn v-if="!hasPage($route.params.page + 1)" color="primary" @click="addNewPage"><v-icon>mdi-plus</v-icon></v-btn>
             </v-row>
         </v-col>
 
@@ -31,9 +25,13 @@
                     <v-card>
                         <v-card-actions class='justify-space-between'>
                             <v-btn icon v-if="card.cols > 0"
-                            @click="cards[rowId][colId].cols-=1"><v-icon>mdi-arrow-collapse</v-icon></v-btn>
+                              @click="cards[rowId][colId].cols-=1"><v-icon>mdi-arrow-collapse</v-icon></v-btn>
                             <v-btn icon 
-                            @click="cards[rowId][colId].cols+=1"><v-icon>mdi-arrow-expand</v-icon></v-btn>
+                              @click="cards[rowId][colId].cols+=1"><v-icon>mdi-arrow-expand</v-icon></v-btn>
+                            <v-spacer/>
+                            <v-btn icon @click="cards[rowId].splice(colId, 0, emptyCell)"><v-icon>mdi-chevron-left</v-icon></v-btn>
+                            <v-btn icon @click="cards[rowId].splice(colId, 1)"><v-icon>mdi-delete</v-icon></v-btn>
+                            <v-btn icon @click="cards[rowId].splice(colId-1, 0, emptyCell)"><v-icon>mdi-chevron-right</v-icon></v-btn>
                         </v-card-actions>
                         <v-card-text v-if="card.cols > 0">
                             <v-textarea auto-grow v-model="card.line" dense flat/>
@@ -46,20 +44,14 @@
         
         <v-col cols="1" align-self="center">
             <v-row class="ma-5">
-                <v-btn icon v-if="hasPage($route.params.page - 1)" @click="$router.push(`${$route.params.page - 1}`)">
+                <v-btn icon v-if="hasPage($route.params.page - 1)" @click="movePage(`${$route.params.page - 1}`)">
                     <v-icon>mdi-arrow-right</v-icon>
                 </v-btn>
-            </v-row>
-            <v-row class="mt-5 ml-5">
-                <v-btn outlined @click="cards.forEach(elem => elem.push(Object.create(emptyCell)))"><v-icon>mdi-plus</v-icon></v-btn>
-            </v-row>
-            <v-row class="ma-5">
-                <v-btn outlined @click="cards.forEach(elem => elem.pop())"><v-icon>mdi-minus</v-icon></v-btn>
             </v-row>
         </v-col>
     </v-row>
     <v-row justify="center" class="ma-5">
-        <v-btn outlined @click="addRow"><v-icon>mdi-plus</v-icon></v-btn>
+        <v-btn outlined @click="cards.push([emptyCell])"><v-icon>mdi-plus</v-icon></v-btn>
         <v-btn outlined @click="cards.pop()"><v-icon>mdi-minus</v-icon></v-btn>
     </v-row>
 
@@ -155,6 +147,11 @@ export default {
       save(){
           editPage(this.$route.params.projID, this.$route.params.page, JSON.stringify(this.cards))()
             .catch(err => console.log(err))
+      },
+      movePage(page){
+        editPage(this.$route.params.projID, this.$route.params.page, JSON.stringify(this.cards))()
+          .then( () => this.$router.push(page))
+          .catch(err => console.log(err))
       }
   }
 }
